@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, FeatureGroup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -15,26 +14,40 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Import leaflet-draw after setting up Leaflet
+// Import leaflet-draw
 import 'leaflet-draw';
 
-interface DrawControlProps {
-  onPolygonCreated: (coordinates: any[]) => void;
-}
-
-const DrawControl: React.FC<DrawControlProps> = ({ onPolygonCreated }) => {
-  const map = useMap();
-  const featureGroupRef = useRef<L.FeatureGroup>(new L.FeatureGroup());
+const MapComponent = () => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<L.Map | null>(null);
+  const featureGroup = useRef<L.FeatureGroup | null>(null);
+  const [polygonCoordinates, setPolygonCoordinates] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!map) return;
+    if (!mapContainer.current || map.current) return;
 
-    const featureGroup = featureGroupRef.current;
-    map.addLayer(featureGroup);
+    // Initialize map
+    map.current = L.map(mapContainer.current).setView([28.6139, 77.2090], 10);
 
+    // Add tile layers
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map.current);
+
+    // Add satellite overlay
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '&copy; <a href="https://www.esri.com/">Esri</a>',
+      opacity: 0.6
+    }).addTo(map.current);
+
+    // Create feature group for drawings
+    featureGroup.current = new L.FeatureGroup();
+    map.current.addLayer(featureGroup.current);
+
+    // Create draw control
     const drawControl = new L.Control.Draw({
       edit: {
-        featureGroup: featureGroup,
+        featureGroup: featureGroup.current,
       },
       draw: {
         rectangle: false,
@@ -53,11 +66,12 @@ const DrawControl: React.FC<DrawControlProps> = ({ onPolygonCreated }) => {
       }
     });
 
-    map.addControl(drawControl);
+    map.current.addControl(drawControl);
 
+    // Event handlers
     const onDrawCreated = (e: any) => {
       const { layer } = e;
-      featureGroup.addLayer(layer);
+      featureGroup.current?.addLayer(layer);
       updatePolygonCoordinates();
       toast({
         title: "Polygon Created",
@@ -65,7 +79,7 @@ const DrawControl: React.FC<DrawControlProps> = ({ onPolygonCreated }) => {
       });
     };
 
-    const onDrawEdited = (e: any) => {
+    const onDrawEdited = () => {
       updatePolygonCoordinates();
       toast({
         title: "Polygon Updated",
@@ -73,7 +87,7 @@ const DrawControl: React.FC<DrawControlProps> = ({ onPolygonCreated }) => {
       });
     };
 
-    const onDrawDeleted = (e: any) => {
+    const onDrawDeleted = () => {
       updatePolygonCoordinates();
       toast({
         title: "Polygon Deleted",
@@ -82,7 +96,9 @@ const DrawControl: React.FC<DrawControlProps> = ({ onPolygonCreated }) => {
     };
 
     const updatePolygonCoordinates = () => {
-      const layers = featureGroup.getLayers();
+      if (!featureGroup.current) return;
+
+      const layers = featureGroup.current.getLayers();
       const coordinates = layers.map((layer: any) => {
         if (layer instanceof L.Polygon) {
           return {
@@ -95,31 +111,22 @@ const DrawControl: React.FC<DrawControlProps> = ({ onPolygonCreated }) => {
         return null;
       }).filter(Boolean);
 
-      onPolygonCreated(coordinates);
+      setPolygonCoordinates(coordinates);
     };
 
-    map.on(L.Draw.Event.CREATED, onDrawCreated);
-    map.on(L.Draw.Event.EDITED, onDrawEdited);
-    map.on(L.Draw.Event.DELETED, onDrawDeleted);
+    // Add event listeners
+    map.current.on(L.Draw.Event.CREATED, onDrawCreated);
+    map.current.on(L.Draw.Event.EDITED, onDrawEdited);
+    map.current.on(L.Draw.Event.DELETED, onDrawDeleted);
 
+    // Cleanup function
     return () => {
-      map.removeControl(drawControl);
-      map.removeLayer(featureGroup);
-      map.off(L.Draw.Event.CREATED, onDrawCreated);
-      map.off(L.Draw.Event.EDITED, onDrawEdited);
-      map.off(L.Draw.Event.DELETED, onDrawDeleted);
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
     };
-  }, [map, onPolygonCreated]);
-
-  return null;
-};
-
-const MapComponent = () => {
-  const [polygonCoordinates, setPolygonCoordinates] = useState<any[]>([]);
-
-  const handlePolygonCreated = (coordinates: any[]) => {
-    setPolygonCoordinates(coordinates);
-  };
+  }, []);
 
   const copyCoordinates = () => {
     if (polygonCoordinates.length > 0) {
@@ -137,24 +144,10 @@ const MapComponent = () => {
         <div className="lg:col-span-2">
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-agricultural-dark mb-4">Field Selection Map</h3>
-            <div className="w-full h-96 rounded-lg border border-border overflow-hidden">
-              <MapContainer
-                center={[28.6139, 77.2090]} // Delhi, India coordinates
-                zoom={10}
-                style={{ height: '100%', width: '100%' }}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <TileLayer
-                  attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                  opacity={0.6}
-                />
-                <DrawControl onPolygonCreated={handlePolygonCreated} />
-              </MapContainer>
-            </div>
+            <div 
+              ref={mapContainer} 
+              className="w-full h-96 rounded-lg border border-border"
+            />
           </Card>
         </div>
 
