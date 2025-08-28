@@ -17,6 +17,8 @@ The system should deliver **precise, stage-specific irrigation and fertilizer re
 - An **integrated growth stage–nutrient health** approach ensures resources are applied at the **right time, in the right quantity, and to the right zones**.  
 
 ---
+🚧 **Note:** We were only told to implement **30% of the project**.
+- Nutrient health mapping and the complete recommendation system using gen-ai are planned but not yet implemented.  
 
 ## 📂 Data Sources & APIs  
 - 🌍 **Sentinel-2 satellite imagery**  
