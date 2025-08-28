@@ -33,24 +33,6 @@ The system should deliver **precise, stage-specific irrigation and fertilizer re
 
 ---
 
-## 🧠 Core Components  
-
-### 🔹 AI & Machine Learning  
-- Use of **CNNs** and **MCLSTM** (Memory Cell LSTM) for sequential growth stage detection.  
-- **DeepCGM** model to integrate growth stage + nutrient mapping.  
-
-### 🔹 Data-Driven Insights  
-- NDVI/NDRE analysis for vegetation health.  
-- Soil fertility overlays for nutrient deficiencies.  
-- Historical yield-weather fusion for better predictions.  
-
-### 🔹 Optimized Potato Yield  
-- Stage-specific irrigation recommendation.  
-- Nitrogen-level mapping for targeted fertilizer use.  
-- Precision farming for **higher yield with lower cost**.  
-
----
-
 ## 🏗️ System Architecture  
 
 ```mermaid
@@ -80,4 +62,42 @@ flowchart TD
     G1 --> H[Output Dashboard / Report]
     G2 --> H
     H --> I[End]
+```
 
+
+## 🧠 Core Components  
+
+### 🧠 AI & ML Models Used  
+- **MCLSTM (Multivariate Convolutional LSTM):** For capturing temporal + spatial crop growth changes  
+- **DeepCGM (Deep Crop Growth Model):** For growth stage classification & nutrient health estimation  
+- **Classification Model (Random Forest / XGBoost):** Fertilizer usage recommendation 
+
+### 🔹 Data-Driven Insights  
+- NDVI/NDRE analysis for vegetation health.  
+- Soil fertility overlays for nutrient deficiencies.  
+- Historical yield-weather fusion for better predictions.  
+
+### 🔹 Optimized Potato Yield  
+- Stage-specific irrigation recommendation.  
+- Nitrogen-level mapping for targeted fertilizer use.  
+- Precision farming for **higher yield with lower cost**.  
+
+---
+## 📊 Correlation Matrix
+Understanding the relationships between variables in our dataset.
+
+![Correlation Matrix](images/correlation_matrix.png)
+
+---
+
+## 🧹 Pre-processed Data
+Sample of the cleaned and structured dataset used for training.
+
+![Pre-processed Data](images/preprocessed_data.png)
+
+---
+
+## ✅ Model Output
+Accuracy results of the fertilizer recommendation model.
+
+![Model Accuracy](images/model_accuracy.png)
