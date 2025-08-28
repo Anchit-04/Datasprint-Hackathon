@@ -52,6 +52,18 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				agricultural: {
+					primary: 'hsl(var(--agricultural-primary))',
+					light: 'hsl(var(--agricultural-light))',
+					medium: 'hsl(var(--agricultural-medium))',
+					dark: 'hsl(var(--agricultural-dark))',
+					accent: 'hsl(var(--agricultural-accent))'
+				},
+				stage: {
+					early: 'hsl(var(--stage-early))',
+					mid: 'hsl(var(--stage-mid))',
+					late: 'hsl(var(--stage-late))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
