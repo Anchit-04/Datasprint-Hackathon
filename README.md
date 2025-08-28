@@ -1,73 +1,83 @@
-# Welcome to your Lovable project
+# 🌱 AI-Powered Potato Crop Growth Stage & Nutrient Health Management  
 
-## Project info
+## 📌 Problem Statement  
+Develop an AI solution that uses satellite imagery to simultaneously detect **growth stages of potato crops** and **map nutrient health** (e.g., Nitrogen levels).  
 
-**URL**: https://lovable.dev/projects/04cd4911-0327-4057-9a5f-8747fd996f9e
+The system should deliver **precise, stage-specific irrigation and fertilizer recommendations** to:  
+- Maximize yield  
+- Optimize resource use  
+- Reduce costs  
+- Improve long-term soil health  
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🚜 Why It Matters  
+- Incorrect timing of irrigation or fertilization can drastically reduce yields.  
+- Inefficient nutrient management increases costs and degrades soil quality.  
+- An **integrated growth stage–nutrient health** approach ensures resources are applied at the **right time, in the right quantity, and to the right zones**.  
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/04cd4911-0327-4057-9a5f-8747fd996f9e) and start prompting.
+## 📂 Data Sources & APIs  
+- 🌍 **Sentinel-2 satellite imagery**  
+- 🌱 **NDVI/NDRE vegetation indices**  
+- 🧪 **Soil fertility datasets**  
+- 🌦 **Historical yield and weather data** (optional for refinement)  
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🎯 Prototype Goals  
+- Process **sample satellite images** of potato fields  
+- Classify fields into **at least 3 growth stages**  
+- Highlight **low-fertility zones** using NDVI/NDRE analysis  
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🧠 Core Components  
 
-Follow these steps:
+### 🔹 AI & Machine Learning  
+- Use of **CNNs** and **MCLSTM** (Memory Cell LSTM) for sequential growth stage detection.  
+- **DeepCGM** model to integrate growth stage + nutrient mapping.  
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 🔹 Data-Driven Insights  
+- NDVI/NDRE analysis for vegetation health.  
+- Soil fertility overlays for nutrient deficiencies.  
+- Historical yield-weather fusion for better predictions.  
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 🔹 Optimized Potato Yield  
+- Stage-specific irrigation recommendation.  
+- Nitrogen-level mapping for targeted fertilizer use.  
+- Precision farming for **higher yield with lower cost**.  
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## 🏗️ System Architecture  
 
-**Edit a file directly in GitHub**
+```mermaid
+flowchart TD
+    A[Start] --> B[Collect Satellite Data]
+    B --> B1[Sentinel-2 Images via Copernicus API]
+    B --> B2[NDVI / NDRE Indices from SentinelHub API]
+    B --> B3[Optional: Soil Fertility & Weather Data]
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+    B1 --> C[Preprocessing]
+    B2 --> C
+    B3 --> C
 
-**Use GitHub Codespaces**
+    C --> D[Crop Growth Stage Detection Model]
+    D --> D1[Classify: Early Growth / Mid Growth / Bulking]
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+    C --> E[Nutrient Health Analysis]
+    E --> E1[Detect Nitrogen Deficiency Zones using NDVI/NDRE]
 
-## What technologies are used for this project?
+    D1 --> F[Decision Engine]
+    E1 --> F
 
-This project is built with:
+    F --> G[Stage-Specific Recommendations]
+    G --> G1[Irrigation Plan: When & How Much]
+    G --> G2[Fertilizer Plan: What Type & Dosage]
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+    G1 --> H[Output Dashboard / Report]
+    G2 --> H
+    H --> I[End]
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/04cd4911-0327-4057-9a5f-8747fd996f9e) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
