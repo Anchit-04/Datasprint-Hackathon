@@ -1,6 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
-import { EditControl } from 'react-leaflet-draw';
+import React, { useState, useRef, useEffect } from 'react';
+import { MapContainer, TileLayer, FeatureGroup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -16,53 +15,109 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
+// Import leaflet-draw after setting up Leaflet
+import 'leaflet-draw';
+
+interface DrawControlProps {
+  onPolygonCreated: (coordinates: any[]) => void;
+}
+
+const DrawControl: React.FC<DrawControlProps> = ({ onPolygonCreated }) => {
+  const map = useMap();
+  const featureGroupRef = useRef<L.FeatureGroup>(new L.FeatureGroup());
+
+  useEffect(() => {
+    if (!map) return;
+
+    const featureGroup = featureGroupRef.current;
+    map.addLayer(featureGroup);
+
+    const drawControl = new L.Control.Draw({
+      edit: {
+        featureGroup: featureGroup,
+      },
+      draw: {
+        rectangle: false,
+        circle: false,
+        circlemarker: false,
+        marker: false,
+        polyline: false,
+        polygon: {
+          allowIntersection: false,
+          shapeOptions: {
+            color: '#22c55e',
+            weight: 3,
+            fillOpacity: 0.2
+          }
+        }
+      }
+    });
+
+    map.addControl(drawControl);
+
+    const onDrawCreated = (e: any) => {
+      const { layer } = e;
+      featureGroup.addLayer(layer);
+      updatePolygonCoordinates();
+      toast({
+        title: "Polygon Created",
+        description: "Field boundary has been drawn successfully.",
+      });
+    };
+
+    const onDrawEdited = (e: any) => {
+      updatePolygonCoordinates();
+      toast({
+        title: "Polygon Updated",
+        description: "Field boundary has been modified.",
+      });
+    };
+
+    const onDrawDeleted = (e: any) => {
+      updatePolygonCoordinates();
+      toast({
+        title: "Polygon Deleted",
+        description: "Field boundary has been removed.",
+      });
+    };
+
+    const updatePolygonCoordinates = () => {
+      const layers = featureGroup.getLayers();
+      const coordinates = layers.map((layer: any) => {
+        if (layer instanceof L.Polygon) {
+          return {
+            type: 'Polygon',
+            coordinates: layer.getLatLngs().map((ring: any) => 
+              ring.map((point: any) => [point.lng, point.lat])
+            )
+          };
+        }
+        return null;
+      }).filter(Boolean);
+
+      onPolygonCreated(coordinates);
+    };
+
+    map.on(L.Draw.Event.CREATED, onDrawCreated);
+    map.on(L.Draw.Event.EDITED, onDrawEdited);
+    map.on(L.Draw.Event.DELETED, onDrawDeleted);
+
+    return () => {
+      map.removeControl(drawControl);
+      map.removeLayer(featureGroup);
+      map.off(L.Draw.Event.CREATED, onDrawCreated);
+      map.off(L.Draw.Event.EDITED, onDrawEdited);
+      map.off(L.Draw.Event.DELETED, onDrawDeleted);
+    };
+  }, [map, onPolygonCreated]);
+
+  return null;
+};
+
 const MapComponent = () => {
   const [polygonCoordinates, setPolygonCoordinates] = useState<any[]>([]);
-  const featureGroupRef = useRef<L.FeatureGroup>(null);
 
-  const onCreated = (e: any) => {
-    const { layer } = e;
-    const coordinates = layer.getLatLngs();
-    
-    updatePolygonCoordinates();
-    toast({
-      title: "Polygon Created",
-      description: "Field boundary has been drawn successfully.",
-    });
-  };
-
-  const onEdited = (e: any) => {
-    updatePolygonCoordinates();
-    toast({
-      title: "Polygon Updated",
-      description: "Field boundary has been modified.",
-    });
-  };
-
-  const onDeleted = (e: any) => {
-    updatePolygonCoordinates();
-    toast({
-      title: "Polygon Deleted",
-      description: "Field boundary has been removed.",
-    });
-  };
-
-  const updatePolygonCoordinates = () => {
-    if (!featureGroupRef.current) return;
-
-    const layers = featureGroupRef.current.getLayers();
-    const coordinates = layers.map((layer: any) => {
-      if (layer instanceof L.Polygon) {
-        return {
-          type: 'Polygon',
-          coordinates: layer.getLatLngs().map((ring: any) => 
-            ring.map((point: any) => [point.lng, point.lat])
-          )
-        };
-      }
-      return null;
-    }).filter(Boolean);
-
+  const handlePolygonCreated = (coordinates: any[]) => {
     setPolygonCoordinates(coordinates);
   };
 
@@ -97,33 +152,7 @@ const MapComponent = () => {
                   url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                   opacity={0.6}
                 />
-                <FeatureGroup ref={featureGroupRef}>
-                  <EditControl
-                    position="topright"
-                    onCreated={onCreated}
-                    onEdited={onEdited}
-                    onDeleted={onDeleted}
-                    draw={{
-                      rectangle: false,
-                      circle: false,
-                      circlemarker: false,
-                      marker: false,
-                      polyline: false,
-                      polygon: {
-                        allowIntersection: false,
-                        drawError: {
-                          color: '#e1e100',
-                          message: '<strong>Error:</strong> Shape edges cannot cross!'
-                        },
-                        shapeOptions: {
-                          color: '#22c55e',
-                          weight: 3,
-                          fillOpacity: 0.2
-                        }
-                      }
-                    }}
-                  />
-                </FeatureGroup>
+                <DrawControl onPolygonCreated={handlePolygonCreated} />
               </MapContainer>
             </div>
           </Card>
