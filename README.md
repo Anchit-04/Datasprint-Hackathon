@@ -86,18 +86,18 @@ flowchart TD
 ## 📊 Correlation Matrix
 Understanding the relationships between variables in our dataset.
 
-![Correlation Matrix](images/correlation_matrix.png)
+![Correlation Matrix](correlation_matrix.jpg)
 
 ---
 
 ## 🧹 Pre-processed Data
 Sample of the cleaned and structured dataset used for training.
 
-![Pre-processed Data](images/preprocessed_data.png)
+![Pre-processed Data](Satellite_image_preprocessed.jpg)
 
 ---
 
 ## ✅ Model Output
 Accuracy results of the fertilizer recommendation model.
 
-![Model Accuracy](images/model_accuracy.png)
+![Model Accuracy](accuracy_data.jpg)
