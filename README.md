@@ -39,31 +39,60 @@ The system should deliver **precise, stage-specific irrigation and fertilizer re
 
 ```mermaid
 flowchart TD
-    A[Start] --> B[Collect Satellite Data]
-    B --> B1[Sentinel-2 Images via Copernicus API]
-    B --> B2[NDVI / NDRE Indices from SentinelHub API]
-    B --> B3[Optional: Soil Fertility & Weather Data]
+  %% Farmer Input
+  subgraph Farmer_Input [Farmer Input]
+    A(Start) --> B[Farmer logs in & provides field data]
+    B --> C[1. Field Location & Boundaries]
+    B --> D[2. Uploads Soil Health Card]
+  end
 
-    B1 --> C[Preprocessing]
-    B2 --> C
-    B3 --> C
+  %% Automated Backend Pipeline
+  subgraph Backend_Pipeline [Automated Backend Pipeline]
+    E[Weekly Scheduler]
+    E --> F[Fetch Sentinel-2 Satellite Images]
+    E --> G[Fetch Weather & Historical Data]
+  end
 
-    C --> D[Crop Growth Stage Detection Model]
-    D --> D1[Classify: Early Growth / Mid Growth / Bulking]
+  %% AI Analysis & Processing
+  subgraph AI_Analysis [AI Analysis & Processing]
+    H((AI Core))
+    C --> H
+    D --> H
+    F --> H
+    G --> H
+    H --> I[Process Images:<br>Calculate NDVI/NDRE]
+    I --> J([ML Model:<br>Classify Growth Stage])
+    I --> K([ML Model:<br>Map Nutrient Health - N, P, K])
+  end
 
-    C --> E[Nutrient Health Analysis]
-    E --> E1[Detect Nitrogen Deficiency Zones using NDVI/NDRE]
+  %% Recommendation Engine
+  subgraph Recommendation_Engine [Recommendation Engine]
+    L[MCP:<br>Master Control Program]
+    J --> L
+    K --> L
+    L --> M[Agentic AI:<br>Generate Actionable Insights]
+    M --> N{Create Zone-wise<br>Irrigation Plan}
+    M --> O{Create Stage-Specific<br>Fertilizer Plan}
+    M --> P{Generate Actionable Alerts}
+  end
 
-    D1 --> F[Decision Engine]
-    E1 --> F
+  %% Farmer-Facing App
+  subgraph Farmer_App [Farmer-Facing App]
+    Q[Integrated Dashboard]
+    N --> Q
+    O --> Q
+    P --> Q
+    Q --> R[Display Interactive Health Map]
+    Q --> S[Show Recommendations & Crop Stage]
+    Q --> T[Push Notifications & Alerts]
+  end
 
-    F --> G[Stage-Specific Recommendations]
-    G --> G1[Irrigation Plan: When & How Much]
-    G --> G2[Fertilizer Plan: What Type & Dosage]
+  T --> U(End)
 
-    G1 --> H[Output Dashboard / Report]
-    G2 --> H
-    H --> I[End]
+  %% Styling for start & end
+  style A fill:#4CAF50,color:#fff,stroke:#388E3C,stroke-width:2px
+  style U fill:#F44336,color:#fff,stroke:#D32F2F,stroke-width:2px
+
 ```
 
 
